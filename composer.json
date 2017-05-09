@@ -1,0 +1,24 @@
+{
+    "name": "sofico/webdriver",
+    "description": "Facebook's php-webdriver extension",
+    "type": "library",
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "Petr Benes",
+            "email": "beny406@seznam.cz"
+        }
+    ],
+    "require": {
+        "php": "~7.0",
+        "facebook/webdriver": "1.4.0",
+        "monolog/monolog": "^1.22",
+        "phpunit/phpunit": "^6.1"
+    },
+
+    "autoload": {
+        "psr-4": {
+            "Sofico\\Webdriver\\": "src/"
+        }
+    }
+}
