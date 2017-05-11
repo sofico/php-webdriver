@@ -6,6 +6,8 @@ use Exception;
 use Facebook\WebDriver\Remote\DesiredCapabilities;
 use Facebook\WebDriver\Remote\WebDriverBrowserType;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LogLevel;
+use Throwable;
 
 /**
  * Extend this to get environment ready to test.
@@ -53,5 +55,9 @@ abstract class BasicTest extends TestCase
         $this->driver->quit();
     }
 
+    protected function onNotSuccessfulTest(Throwable $e)
+    {
+        $this->driver->log(LogLevel::ERROR, "{$e->getMessage()} \n{$e->getTraceAsString()}");
+    }
 
 }

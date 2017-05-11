@@ -11,17 +11,30 @@ use Facebook\WebDriver\WebDriverBy;
  * Class Module encapsulates other modules and elements.
  * @package Sofico\Webdriver
  */
-class Module extends RemoteWebElement
+class Module extends RemoteWebElement implements Context
 {
+    use FindModuleTrait {
+        findModules as traitFindModules;
+        findModule as traitFindModule;
+    }
+
+    protected $webdriver;
+
+
     /**
      * Module constructor.
      * @param RemoteExecuteMethod $executor
      * @param string $id
+     * @param RemoteDriver $webdriver
      */
-    public function __construct(RemoteExecuteMethod $executor, $id)
+    public function __construct(RemoteExecuteMethod $executor, string $id, RemoteDriver $webdriver = null)
     {
         parent::__construct($executor, $id);
-        $this->initializeElements();
+        $isModule = !is_null($webdriver);
+        if ($isModule) {
+            $this->webdriver = $webdriver;
+            $this->initializeElements();
+        }
     }
 
     /**
@@ -38,17 +51,7 @@ class Module extends RemoteWebElement
      */
     public function findModule(WebDriverBy $by, string $class)
     {
-        $params = [
-            'using' => $by->getMechanism(),
-            'value' => $by->getValue(),
-            ':id' => $this->id,
-        ];
-        $raw_element = $this->executor->execute(
-            DriverCommand::FIND_CHILD_ELEMENT,
-            $params
-        );
-
-        return $this->newModule($raw_element['ELEMENT'], $class);
+        return $this->traitFindModule($by, $class, true);
     }
 
     /**
@@ -58,32 +61,40 @@ class Module extends RemoteWebElement
      */
     public function findModules(WebDriverBy $by, string $class)
     {
-        $params = [
-            'using' => $by->getMechanism(),
-            'value' => $by->getValue(),
-            ':id' => $this->id,
-        ];
-        $raw_elements = $this->executor->execute(
-            DriverCommand::FIND_CHILD_ELEMENTS,
-            $params
-        );
-
-        $elements = [];
-        foreach ($raw_elements as $raw_element) {
-            $elements[] = $this->newModule($raw_element['ELEMENT'], $class);
-        }
-
-        return $elements;
+        return $this->traitFindModules($by, $class, true);
     }
 
     /**
-     * @param $id
-     * @param $class
-     * @return mixed
+     * @param string $id
+     * @return RemoteWebElement
      */
-    protected function newModule($id, $class)
+    protected function newElement($id)
     {
-        return new $class($this->executor, $id);
+        return new RemoteWebElement($this->executor, $id);
     }
 
+    /**
+     * @return RemoteDriver
+     */
+    public function getWebdriver()
+    {
+        return $this->webdriver;
+    }
+
+    /**
+     * @return RemoteExecuteMethod
+     */
+    public function getExecutor()
+    {
+        return $this->executor;
+    }
+
+    /**
+     * @param string $propertyName
+     * @return string
+     */
+    public function getProperty(string $propertyName): string
+    {
+        $this->getWebdriver()->getProperty($propertyName);
+    }
 }

@@ -2,8 +2,14 @@
 
 namespace Sofico\Webdriver;
 
-class Page
+use Facebook\WebDriver\WebDriverBy;
+
+class Page implements Context
 {
+    use FindModuleTrait {
+        findModules as traitFindModules;
+        findModule as traitFindModule;
+    }
 
     protected $webdriver;
     protected $address;
@@ -43,6 +49,27 @@ class Page
     {
     }
 
+
+    /**
+     * @param WebDriverBy $by
+     * @param string $class
+     * @return mixed
+     */
+    public function findModule(WebDriverBy $by, string $class)
+    {
+        return $this->traitFindModule($by, $class, false);
+    }
+
+    /**
+     * @param WebDriverBy $by
+     * @param string $class
+     * @return array
+     */
+    public function findModules(WebDriverBy $by, string $class)
+    {
+        return $this->traitFindModules($by, $class, false);
+    }
+
     /**
      * Override this to get full path of page. Will be concatenated with baseUrl.
      * @return string
@@ -77,4 +104,18 @@ class Page
     }
 
 
+    public function getWebdriver()
+    {
+        return $this->webdriver;
+    }
+
+    public function getExecutor()
+    {
+        return $this->getWebdriver()->getExecutor();
+    }
+
+    public function getProperty(string $propertyName): string
+    {
+        $this->getWebdriver()->getProperty($propertyName);
+    }
 }

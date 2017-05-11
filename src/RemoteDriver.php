@@ -13,8 +13,12 @@ use Monolog\Logger;
  * Extended {@see WebDriver} with custom functions.
  * @package Sofico\Webdriver
  */
-class RemoteDriver extends RemoteWebDriver
+class RemoteDriver extends RemoteWebDriver implements Context
 {
+    use FindModuleTrait {
+        findModules as traitFindModules;
+        findModule as traitFindModule;
+    }
 
     /* @var Logger */
     protected $logger;
@@ -39,14 +43,35 @@ class RemoteDriver extends RemoteWebDriver
         $this->config = $config;
         $this->reportingActive = $config->reportingActive();
         if ($this->reportingActive) {
-            file_exists($config->getCommonReportDir()) ? "" : mkdir($config->getCommonReportDir());
-            $this->testReportDir = "{$config->getBaseDir()}/Reports/{$this->timestamp}_{$this->config->getProperty(BasicConfig::TEST_NAME)}";
-            mkdir($this->testReportDir);
-            $logFile = "{$this->testReportDir}/driver.log";
-            fopen($logFile, 'a');
-            $this->logger = new Logger('DriverLogger');
-            $this->logger->pushHandler(new StreamHandler($logFile, Logger::DEBUG));
+            $logFile = $this->createLogFile($config);
+            $this->createLogger($logFile);
         }
+    }
+
+    /**
+     * @param BasicConfig $config
+     * @return string
+     */
+    private function createLogFile(BasicConfig $config): string
+    {
+        file_exists($config->getCommonReportDir()) ? "" : mkdir($config->getCommonReportDir());
+        $this->testReportDir = "{$config->getBaseDir()}/Reports/{$this->timestamp}_{$this->config->getProperty(BasicConfig::TEST_NAME)}";
+        mkdir($this->testReportDir);
+        $logFile = "{$this->testReportDir}/driver.log";
+        fopen($logFile, 'a');
+        return $logFile;
+    }
+
+    /**
+     * @param $logFile
+     */
+    private function createLogger($logFile)
+    {
+        $this->logger = new Logger('DriverLogger');
+        $handler = new StreamHandler($logFile, Logger::DEBUG);
+        $handler->getFormatter()->ignoreEmptyContextAndExtra(true);
+        $handler->getFormatter()->includeStacktraces(true);
+        $this->logger->pushHandler($handler);
     }
 
     /**
@@ -56,13 +81,7 @@ class RemoteDriver extends RemoteWebDriver
      */
     public function findModule(WebDriverBy $by, string $class)
     {
-        $params = ['using' => $by->getMechanism(), 'value' => $by->getValue()];
-        $raw_element = $this->execute(
-            DriverCommand::FIND_ELEMENT,
-            $params
-        );
-
-        return $this->newModule($raw_element['ELEMENT'], $class);
+        return $this->traitFindModule($by, $class, false);
     }
 
     /**
@@ -72,29 +91,9 @@ class RemoteDriver extends RemoteWebDriver
      */
     public function findModules(WebDriverBy $by, string $class)
     {
-        $params = ['using' => $by->getMechanism(), 'value' => $by->getValue()];
-        $raw_elements = $this->execute(
-            DriverCommand::FIND_ELEMENTS,
-            $params
-        );
-
-        $elements = [];
-        foreach ($raw_elements as $raw_element) {
-            $elements[] = $this->newModule($raw_element['ELEMENT'], $class);
-        }
-
-        return $elements;
+        return $this->traitFindModules($by, $class, false);
     }
 
-    /**
-     * @param $id
-     * @param $class
-     * @return mixed
-     */
-    protected function newModule($id, $class)
-    {
-        return new $class($this->getExecuteMethod(), $id);
-    }
 
     /**
      * @param $level
@@ -102,11 +101,13 @@ class RemoteDriver extends RemoteWebDriver
      */
     public function log($level, $message)
     {
-        $context = array(debug_backtrace()[1]['class']);
-        $context[] = debug_backtrace()[1]['function'];
-        $this->reportingActive ? $this->logger->log($level, $message, $context) : "";
+        $context = debug_backtrace()[1]['class'];
+        $this->reportingActive ? $this->logger->log($level, "$context: $message") : "";
     }
 
+    /**
+     *
+     */
     public function logResultScreen()
     {
         $this->reportingActive ? $this->takeScreenshot($this->getTestReportDir() . '/endingScreen.jpg') : "";
@@ -136,5 +137,38 @@ class RemoteDriver extends RemoteWebDriver
         return $this->config;
     }
 
+
+    /**
+     * @return RemoteDriver
+     */
+    public function getWebdriver(): self
+    {
+        return $this;
+    }
+
+    /**
+     * @return HttpCommandExecutor|null
+     */
+    public function getExecutor()
+    {
+        return $this->executor;
+    }
+
+    /**
+     * @param string $propertyName
+     * @return string
+     */
+    public function getProperty(string $propertyName): string
+    {
+        return $this->config->getProperty($propertyName);
+    }
+
+    /**
+     * @return Logger
+     */
+    public function getLogger(): Logger
+    {
+        return $this->logger;
+    }
 
 }
