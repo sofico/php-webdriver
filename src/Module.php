@@ -2,7 +2,6 @@
 
 namespace Sofico\Webdriver;
 
-use Facebook\WebDriver\Remote\DriverCommand;
 use Facebook\WebDriver\Remote\RemoteExecuteMethod;
 use Facebook\WebDriver\Remote\RemoteWebElement;
 use Facebook\WebDriver\WebDriverBy;
@@ -11,12 +10,15 @@ use Facebook\WebDriver\WebDriverBy;
  * Class Module encapsulates other modules and elements.
  * @package Sofico\Webdriver
  */
-class Module extends RemoteWebElement implements Context
+abstract class Module extends RemoteWebElement implements Context
 {
-    use FindModuleTrait {
+    use FindContextTrait {
+        findElement as traitFindElement;
+        findElements as traitFindElements;
         findModules as traitFindModules;
         findModule as traitFindModule;
     }
+    use LoggingTrait;
 
     protected $webdriver;
 
@@ -40,9 +42,36 @@ class Module extends RemoteWebElement implements Context
     /**
      * Override to initialize elements.
      */
-    protected function initializeElements()
+    protected abstract function initializeElements();
+
+    /**
+     * @param string $pageClass
+     * @param bool $initElements
+     * @return mixed
+     */
+    public function initPage(string $pageClass, bool $initElements = true)
     {
+        return $this->webdriver->initPage($pageClass, $initElements);
     }
+
+    /**
+     * @param WebDriverBy $by
+     * @return RemoteWebElement
+     */
+    public function findElement(WebDriverBy $by)
+    {
+        return $this->traitFindElement($by, false);
+    }
+
+    /**
+     * @param WebDriverBy $by
+     * @return RemoteWebElement[]
+     */
+    public function findElements(WebDriverBy $by)
+    {
+        return $this->traitFindElements($by, false);
+    }
+
 
     /**
      * @param WebDriverBy $by
@@ -70,7 +99,7 @@ class Module extends RemoteWebElement implements Context
      */
     protected function newElement($id)
     {
-        return new RemoteWebElement($this->executor, $id);
+        return new RemoteWebElement($this->getExecuteMethod(), $id);
     }
 
     /**
@@ -84,7 +113,7 @@ class Module extends RemoteWebElement implements Context
     /**
      * @return RemoteExecuteMethod
      */
-    public function getExecutor()
+    public function getExecuteMethod()
     {
         return $this->executor;
     }
@@ -97,4 +126,5 @@ class Module extends RemoteWebElement implements Context
     {
         $this->getWebdriver()->getProperty($propertyName);
     }
+
 }

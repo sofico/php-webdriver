@@ -2,9 +2,9 @@
 
 namespace Sofico\Webdriver;
 
-use Facebook\WebDriver\Remote\DriverCommand;
 use Facebook\WebDriver\Remote\HttpCommandExecutor;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
+use Facebook\WebDriver\Remote\RemoteWebElement;
 use Facebook\WebDriver\WebDriverBy;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
@@ -15,10 +15,14 @@ use Monolog\Logger;
  */
 class RemoteDriver extends RemoteWebDriver implements Context
 {
-    use FindModuleTrait {
+    use FindContextTrait {
+        findElement as traitFindElement;
+        findElements as traitFindElements;
         findModules as traitFindModules;
         findModule as traitFindModule;
     }
+    use LoggingTrait;
+
 
     /* @var Logger */
     protected $logger;
@@ -74,6 +78,29 @@ class RemoteDriver extends RemoteWebDriver implements Context
         $this->logger->pushHandler($handler);
     }
 
+    public function initPage(string $pageClass, bool $initElements = true)
+    {
+        return new $pageClass($this, $initElements, $this->executeMethod);
+    }
+
+    /**
+     * @param WebDriverBy $by
+     * @return RemoteWebElement
+     */
+    public function findElement(WebDriverBy $by)
+    {
+        return $this->traitFindElement($by, false);
+    }
+
+    /**
+     * @param WebDriverBy $by
+     * @return RemoteWebElement[]
+     */
+    public function findElements(WebDriverBy $by)
+    {
+        return $this->traitFindElements($by, false);
+    }
+
     /**
      * @param WebDriverBy $by
      * @param string $class
@@ -94,16 +121,6 @@ class RemoteDriver extends RemoteWebDriver implements Context
         return $this->traitFindModules($by, $class, false);
     }
 
-
-    /**
-     * @param $level
-     * @param $message
-     */
-    public function log($level, $message)
-    {
-        $context = debug_backtrace()[1]['class'];
-        $this->reportingActive ? $this->logger->log($level, "$context: $message") : "";
-    }
 
     /**
      *
@@ -146,13 +163,6 @@ class RemoteDriver extends RemoteWebDriver implements Context
         return $this;
     }
 
-    /**
-     * @return HttpCommandExecutor|null
-     */
-    public function getExecutor()
-    {
-        return $this->executor;
-    }
 
     /**
      * @param string $propertyName
@@ -169,6 +179,14 @@ class RemoteDriver extends RemoteWebDriver implements Context
     public function getLogger(): Logger
     {
         return $this->logger;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isReportingActive(): bool
+    {
+        return $this->reportingActive;
     }
 
 }

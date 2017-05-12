@@ -2,28 +2,45 @@
 
 namespace Sofico\Webdriver;
 
+use Facebook\WebDriver\Remote\RemoteExecuteMethod;
+use Facebook\WebDriver\Remote\RemoteWebElement;
 use Facebook\WebDriver\WebDriverBy;
 
-class Page implements Context
+abstract class Page implements Context
 {
-    use FindModuleTrait {
+    use FindContextTrait {
+        findElement as traitFindElement;
+        findElements as traitFindElements;
         findModules as traitFindModules;
         findModule as traitFindModule;
     }
+    use LoggingTrait;
 
     protected $webdriver;
     protected $address;
+    protected $executeMethod;
 
     /**
      * Page constructor.
      * @param RemoteDriver $webdriver
      * @param bool $init
      */
-    public function __construct(RemoteDriver $webdriver, bool $init = true)
+    public function __construct(RemoteDriver $webdriver, bool $init = true, RemoteExecuteMethod $executeMethod)
     {
+        $this->executeMethod = $executeMethod;
         $this->webdriver = $webdriver;
         $this->address = $this->getBaseUrl() . $this->getUrl();
         if ($init) $this->initializeElements();
+    }
+
+    /**
+     * @param string $pageClass
+     * @param bool $initElements
+     * @return mixed
+     */
+    public function initPage(string $pageClass, bool $initElements = true)
+    {
+        return $this->webdriver->initPage($pageClass, $initElements);
     }
 
     /**
@@ -37,6 +54,9 @@ class Page implements Context
         return $this;
     }
 
+    /**
+     * @param String $path
+     */
     public function takeScreenshot(String $path)
     {
         $this->webdriver->takeScreenshot($path);
@@ -45,8 +65,24 @@ class Page implements Context
     /**
      * Override this to initialize elements
      */
-    protected function initializeElements()
+    protected abstract function initializeElements();
+
+    /**
+     * @param WebDriverBy $by
+     * @return RemoteWebElement
+     */
+    public function findElement(WebDriverBy $by)
     {
+        return $this->traitFindElement($by, false);
+    }
+
+    /**
+     * @param WebDriverBy $by
+     * @return RemoteWebElement[]
+     */
+    public function findElements(WebDriverBy $by)
+    {
+        return $this->traitFindElements($by, false);
     }
 
 
@@ -104,18 +140,30 @@ class Page implements Context
     }
 
 
-    public function getWebdriver()
+    /**
+     * @return RemoteDriver
+     */
+    public function getWebdriver(): RemoteDriver
     {
         return $this->webdriver;
     }
 
-    public function getExecutor()
+    /**
+     * @return RemoteExecuteMethod
+     */
+    public function getExecuteMethod(): RemoteExecuteMethod
     {
-        return $this->getWebdriver()->getExecutor();
+        return $this->executeMethod;
     }
 
+
+    /**
+     * @param string $propertyName
+     * @return string
+     */
     public function getProperty(string $propertyName): string
     {
         $this->getWebdriver()->getProperty($propertyName);
     }
+
 }

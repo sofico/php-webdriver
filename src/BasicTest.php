@@ -45,6 +45,8 @@ abstract class BasicTest extends TestCase
         $this->driver = RemoteDriver::create($hub, $capabilities);
         $config->addProperty(BasicConfig::TEST_NAME, $this->getName());
         $this->driver->withConfig($config);
+        $this->driver->log(LogLevel::INFO, "=== {$this->getName()} starting ===");
+
 
     }
 
@@ -53,11 +55,14 @@ abstract class BasicTest extends TestCase
     {
         $this->driver->logResultScreen();
         $this->driver->quit();
+        $this->driver->log(LogLevel::INFO, "=== {$this->getName()} finished ===");
+
     }
 
     protected function onNotSuccessfulTest(Throwable $e)
     {
         $this->driver->log(LogLevel::ERROR, "{$e->getMessage()} \n{$e->getTraceAsString()}");
+        parent::onNotSuccessfulTest($e);
     }
 
 }

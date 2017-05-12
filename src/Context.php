@@ -14,7 +14,8 @@ interface Context
 
     public function getWebdriver();
 
-    public function getExecutor();
-
     public function getProperty(string $propertyName);
+
+    public function initPage(string $pageClass, bool $initElements = true);
+
 }
