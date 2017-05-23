@@ -17,6 +17,8 @@ abstract class Module extends RemoteWebElement implements Context
         findElements as traitFindElements;
         findModules as traitFindModules;
         findModule as traitFindModule;
+        waitForElement as traitWaitForElement;
+        waitForModule as traitWaitForModule;
     }
     use LoggingTrait;
 
@@ -60,7 +62,17 @@ abstract class Module extends RemoteWebElement implements Context
      */
     public function findElement(WebDriverBy $by)
     {
-        return $this->traitFindElement($by, false);
+        return $this->traitFindElement($by, true);
+    }
+
+    /**
+     * @param WebDriverBy $by
+     * @param int $timeout
+     * @return mixed
+     */
+    public function waitForElement(WebDriverBy $by, int $timeout)
+    {
+        return $this->traitWaitForElement($by, $timeout, true);
     }
 
     /**
@@ -69,7 +81,7 @@ abstract class Module extends RemoteWebElement implements Context
      */
     public function findElements(WebDriverBy $by)
     {
-        return $this->traitFindElements($by, false);
+        return $this->traitFindElements($by, true);
     }
 
 
@@ -81,6 +93,16 @@ abstract class Module extends RemoteWebElement implements Context
     public function findModule(WebDriverBy $by, string $class)
     {
         return $this->traitFindModule($by, $class, true);
+    }
+
+    /**
+     * @param WebDriverBy $by
+     * @param int $timeout
+     * @return mixed
+     */
+    public function waitForModule(WebDriverBy $by, int $timeout)
+    {
+        return $this->traitWaitForModule($by, $timeout, true);
     }
 
     /**

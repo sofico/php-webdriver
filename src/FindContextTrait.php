@@ -9,6 +9,8 @@
 namespace Sofico\Webdriver;
 
 
+use Facebook\WebDriver\Exception\NoSuchElementException;
+use Facebook\WebDriver\Exception\TimeOutException;
 use Facebook\WebDriver\Remote\DriverCommand;
 use Facebook\WebDriver\Remote\RemoteWebElement;
 use Facebook\WebDriver\WebDriverBy;
@@ -16,7 +18,6 @@ use Psr\Log\LogLevel;
 
 trait FindContextTrait
 {
-
     /**
      * Find the first WebDriverElement using the given mechanism.
      *
@@ -34,7 +35,6 @@ trait FindContextTrait
         if ($nested) $params[':id'] = $this->id;
         $command = $nested ? DriverCommand::FIND_CHILD_ELEMENT : DriverCommand::FIND_ELEMENT;
         $raw_element = $this->getWebdriver()->execute($command, $params);
-
 
         return $this->newElement($raw_element['ELEMENT']);
     }
@@ -129,5 +129,47 @@ trait FindContextTrait
     private function newModule($id, $class)
     {
         return new $class($this->getExecuteMethod(), $id, $this->getWebdriver());
+    }
+
+    /**
+     * @param WebDriverBy $by
+     * @param int $timeout
+     * @param bool $nested
+     * @return mixed
+     */
+    public function waitForElement(WebDriverBy $by, int $timeout, bool $nested)
+    {
+        return $this->waitFor($by, $timeout, $nested, 'findElement');
+    }
+
+    /**
+     * @param WebDriverBy $by
+     * @param int $timeout
+     * @param bool $nested
+     * @return mixed
+     */
+    public function waitForModule(WebDriverBy $by, int $timeout, bool $nested)
+    {
+        return $this->waitFor($by, $timeout, $nested, 'findModule');
+    }
+
+    /**
+     * @param WebDriverBy $by
+     * @param int $timeout
+     * @param bool $nested
+     * @param $method
+     * @return mixed
+     * @throws TimeOutException
+     */
+    private function waitFor(WebDriverBy $by, int $timeout, bool $nested, $method)
+    {
+        $end = microtime(true) + $timeout;
+        while ($end > microtime(true)) {
+            try {
+                return $this->$method($by, $nested);
+            } catch (NoSuchElementException $e) {
+            }
+        }
+        throw new TimeOutException("Timeout exception waiting for presence of [{$by->getMechanism()}: '{$by->getValue()}']");
     }
 }

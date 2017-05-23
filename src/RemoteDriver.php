@@ -20,6 +20,8 @@ class RemoteDriver extends RemoteWebDriver implements Context
         findElements as traitFindElements;
         findModules as traitFindModules;
         findModule as traitFindModule;
+        waitForElement as traitWaitForElement;
+        waitForModule as traitWaitForModule;
     }
     use LoggingTrait;
 
@@ -78,6 +80,21 @@ class RemoteDriver extends RemoteWebDriver implements Context
         $this->logger->pushHandler($handler);
     }
 
+    /**
+     * @param string $pageClass
+     * @return mixed
+     */
+    public function goToPage(string $pageClass)
+    {
+        $page = $this->initPage($pageClass, false);
+        return $page->goTo();
+    }
+
+    /**
+     * @param string $pageClass
+     * @param bool $initElements
+     * @return mixed
+     */
     public function initPage(string $pageClass, bool $initElements = true)
     {
         return new $pageClass($this, $initElements, $this->executeMethod);
@@ -91,6 +108,17 @@ class RemoteDriver extends RemoteWebDriver implements Context
     {
         return $this->traitFindElement($by, false);
     }
+
+    /**
+     * @param WebDriverBy $by
+     * @param int $timeout
+     * @return mixed
+     */
+    public function waitForElement(WebDriverBy $by, int $timeout)
+    {
+        return $this->traitWaitForElement($by, $timeout, false);
+    }
+
 
     /**
      * @param WebDriverBy $by
@@ -109,6 +137,16 @@ class RemoteDriver extends RemoteWebDriver implements Context
     public function findModule(WebDriverBy $by, string $class)
     {
         return $this->traitFindModule($by, $class, false);
+    }
+
+    /**
+     * @param WebDriverBy $by
+     * @param int $timeout
+     * @return mixed
+     */
+    public function waitForModule(WebDriverBy $by, int $timeout)
+    {
+        return $this->traitWaitForModule($by, $timeout, false);
     }
 
     /**

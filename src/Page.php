@@ -13,6 +13,8 @@ abstract class Page implements Context
         findElements as traitFindElements;
         findModules as traitFindModules;
         findModule as traitFindModule;
+        waitForElement as traitWaitForElement;
+        waitForModule as traitWaitForModule;
     }
     use LoggingTrait;
 
@@ -78,6 +80,17 @@ abstract class Page implements Context
 
     /**
      * @param WebDriverBy $by
+     * @param int $timeout
+     * @return mixed
+     */
+    public function waitForElement(WebDriverBy $by, int $timeout)
+    {
+        return $this->traitWaitForElement($by, $timeout, false);
+    }
+
+
+    /**
+     * @param WebDriverBy $by
      * @return RemoteWebElement[]
      */
     public function findElements(WebDriverBy $by)
@@ -94,6 +107,16 @@ abstract class Page implements Context
     public function findModule(WebDriverBy $by, string $class)
     {
         return $this->traitFindModule($by, $class, false);
+    }
+
+    /**
+     * @param WebDriverBy $by
+     * @param int $timeout
+     * @return mixed
+     */
+    public function waitForModule(WebDriverBy $by, int $timeout)
+    {
+        return $this->traitWaitForModule($by, $timeout, false);
     }
 
     /**
