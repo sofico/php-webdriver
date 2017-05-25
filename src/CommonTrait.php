@@ -14,9 +14,10 @@ use Facebook\WebDriver\Exception\TimeOutException;
 use Facebook\WebDriver\Remote\DriverCommand;
 use Facebook\WebDriver\Remote\RemoteWebElement;
 use Facebook\WebDriver\WebDriverBy;
+use Facebook\WebDriver\WebDriverWait;
 use Psr\Log\LogLevel;
 
-trait FindContextTrait
+trait CommonTrait
 {
     /**
      * Find the first WebDriverElement using the given mechanism.
@@ -74,7 +75,7 @@ trait FindContextTrait
      */
     protected function newElement($id)
     {
-        return new RemoteWebElement($this->getExecuteMethod(), $id);
+        return new RemoteElement($this->getExecuteMethod(), $id, $this->getWebdriver());
     }
 
 
@@ -133,37 +134,37 @@ trait FindContextTrait
 
     /**
      * @param WebDriverBy $by
-     * @param int $timeout
+     * @param int $timeout in s (default 5)
      * @param bool $nested
      * @return mixed
      */
     public function waitForElement(WebDriverBy $by, int $timeout, bool $nested)
     {
-        return $this->waitFor($by, $timeout, $nested, 'findElement');
+        return $this->waitForDOMElement($by, $timeout, $nested, 'findElement');
     }
 
     /**
      * @param WebDriverBy $by
-     * @param int $timeout
+     * @param int $timeout in s (default 5)
      * @param bool $nested
      * @return mixed
      */
     public function waitForModule(WebDriverBy $by, int $timeout, bool $nested)
     {
-        return $this->waitFor($by, $timeout, $nested, 'findModule');
+        return $this->waitForDOMElement($by, $timeout, $nested, 'findModule');
     }
 
     /**
      * @param WebDriverBy $by
-     * @param int $timeout
+     * @param int $timeout in s
      * @param bool $nested
      * @param $method
      * @return mixed
      * @throws TimeOutException
      */
-    private function waitFor(WebDriverBy $by, int $timeout, bool $nested, $method)
+    private function waitForDOMElement(WebDriverBy $by, int $timeout, bool $nested, $method)
     {
-        $end = microtime(true) + $timeout;
+        $end = microtime(true) + ($timeout * 1000);
         while ($end > microtime(true)) {
             try {
                 return $this->$method($by, $nested);
@@ -171,5 +172,14 @@ trait FindContextTrait
             }
         }
         throw new TimeOutException("Timeout exception waiting for presence of [{$by->getMechanism()}: '{$by->getValue()}']");
+    }
+
+    /**
+     * @param int $timeout
+     */
+    public function waitUntil($func_or_ec, string $message = '', int $timeout = 5)
+    {
+        $wait = new WebDriverWait($this->getWebdriver(), $timeout);
+        $wait->until($func_or_ec, $message);
     }
 }

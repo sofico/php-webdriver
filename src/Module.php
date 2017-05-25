@@ -10,9 +10,9 @@ use Facebook\WebDriver\WebDriverBy;
  * Class Module encapsulates other modules and elements.
  * @package Sofico\Webdriver
  */
-abstract class Module extends RemoteWebElement implements Context
+abstract class Module extends RemoteElement implements Context
 {
-    use FindContextTrait {
+    use CommonTrait {
         findElement as traitFindElement;
         findElements as traitFindElements;
         findModules as traitFindModules;
@@ -22,23 +22,15 @@ abstract class Module extends RemoteWebElement implements Context
     }
     use LoggingTrait;
 
-    protected $webdriver;
-
-
     /**
      * Module constructor.
      * @param RemoteExecuteMethod $executor
      * @param string $id
-     * @param RemoteDriver $webdriver
      */
-    public function __construct(RemoteExecuteMethod $executor, string $id, RemoteDriver $webdriver = null)
+    public function __construct(RemoteExecuteMethod $executor, string $id, RemoteDriver $webdriver)
     {
-        parent::__construct($executor, $id);
-        $isModule = !is_null($webdriver);
-        if ($isModule) {
-            $this->webdriver = $webdriver;
-            $this->initializeElements();
-        }
+        parent::__construct($executor, $id, $webdriver);
+        $this->initializeElements();
     }
 
     /**
@@ -67,10 +59,10 @@ abstract class Module extends RemoteWebElement implements Context
 
     /**
      * @param WebDriverBy $by
-     * @param int $timeout
+     * @param int $timeout in s (default 5)
      * @return mixed
      */
-    public function waitForElement(WebDriverBy $by, int $timeout)
+    public function waitForElement(WebDriverBy $by, int $timeout = 5)
     {
         return $this->traitWaitForElement($by, $timeout, true);
     }
@@ -97,10 +89,10 @@ abstract class Module extends RemoteWebElement implements Context
 
     /**
      * @param WebDriverBy $by
-     * @param int $timeout
+     * @param int $timeout in s (default 5)
      * @return mixed
      */
-    public function waitForModule(WebDriverBy $by, int $timeout)
+    public function waitForModule(WebDriverBy $by, int $timeout = 5)
     {
         return $this->traitWaitForModule($by, $timeout, true);
     }

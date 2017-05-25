@@ -44,10 +44,10 @@ class BasicConfig
         if (!file_exists($this->basicConfigFile)) {
             throw new Exception($this->basicConfigFile . " not found");
         }
-        $this->config['default'] = parse_ini_file($this->basicConfigFile);
+        $this->config['ini_default'] = parse_ini_file($this->basicConfigFile);
         $env = $this->getProperty(self::ENV);
-        $this->config['env'] = parse_ini_file("{$this->configDir}/config.$env.ini");
-
+        $this->config['ini_env'] = parse_ini_file("{$this->configDir}/config.$env.ini");
+        $this->config['env'] = $_SERVER;
     }
 
     /**

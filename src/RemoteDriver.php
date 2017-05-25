@@ -15,7 +15,7 @@ use Monolog\Logger;
  */
 class RemoteDriver extends RemoteWebDriver implements Context
 {
-    use FindContextTrait {
+    use CommonTrait {
         findElement as traitFindElement;
         findElements as traitFindElements;
         findModules as traitFindModules;
@@ -111,10 +111,10 @@ class RemoteDriver extends RemoteWebDriver implements Context
 
     /**
      * @param WebDriverBy $by
-     * @param int $timeout
+     * @param int $timeout in s (default 5)
      * @return mixed
      */
-    public function waitForElement(WebDriverBy $by, int $timeout)
+    public function waitForElement(WebDriverBy $by, int $timeout = 5)
     {
         return $this->traitWaitForElement($by, $timeout, false);
     }
@@ -141,10 +141,10 @@ class RemoteDriver extends RemoteWebDriver implements Context
 
     /**
      * @param WebDriverBy $by
-     * @param int $timeout
+     * @param int $timeout in s (default 5)
      * @return mixed
      */
-    public function waitForModule(WebDriverBy $by, int $timeout)
+    public function waitForModule(WebDriverBy $by, int $timeout = 5)
     {
         return $this->traitWaitForModule($by, $timeout, false);
     }
