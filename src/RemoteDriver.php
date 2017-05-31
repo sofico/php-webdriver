@@ -8,6 +8,7 @@ use Facebook\WebDriver\Remote\RemoteWebElement;
 use Facebook\WebDriver\WebDriverBy;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
+use const true;
 
 /**
  * Extended {@see WebDriver} with custom functions.
@@ -60,10 +61,9 @@ class RemoteDriver extends RemoteWebDriver implements Context
      */
     private function createLogFile(BasicConfig $config): string
     {
-        file_exists($config->getCommonReportDir()) ? "" : mkdir($config->getCommonReportDir());
-        $this->testReportDir = "{$config->getBaseDir()}/Reports/{$this->timestamp}_{$this->config->getProperty(BasicConfig::TEST_NAME)}";
-        mkdir($this->testReportDir);
-        $logFile = "{$this->testReportDir}/driver.log";
+        $this->testReportDir = "{$config->getBaseDir()}/Reports/{$this->config->getProjectName()}/{$this->config->getEnv()}/{$this->config->getBrowserName()}/{$this->timestamp}_{$this->config->getProperty(BasicConfig::TEST_NAME)}";
+        mkdir($this->testReportDir, 0777, true);
+        $logFile = "{$this->testReportDir}/" . BasicConfig::LOG_FILE_NAME;
         fopen($logFile, 'a');
         return $logFile;
     }
@@ -141,12 +141,13 @@ class RemoteDriver extends RemoteWebDriver implements Context
 
     /**
      * @param WebDriverBy $by
-     * @param int $timeout in s (default 5)
+     * @param string $class
+     * @param int $timeout
      * @return mixed
      */
-    public function waitForModule(WebDriverBy $by, int $timeout = 5)
+    public function waitForModule(WebDriverBy $by, string $class, int $timeout = 5)
     {
-        return $this->traitWaitForModule($by, $timeout, false);
+        return $this->traitWaitForModule($by, $class, $timeout, false);
     }
 
     /**
@@ -165,7 +166,7 @@ class RemoteDriver extends RemoteWebDriver implements Context
      */
     public function logResultScreen()
     {
-        $this->reportingActive ? $this->takeScreenshot($this->getTestReportDir() . '/endingScreen.jpg') : "";
+        $this->reportingActive ? $this->takeScreenshot($this->getTestReportDir() . '/' . BasicConfig::SCREEN_FILE_NAME) : "";
     }
 
     /**

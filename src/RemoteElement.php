@@ -28,4 +28,13 @@ class RemoteElement extends RemoteWebElement
         parent::__construct($executor, $id);
         $this->webdriver = $driver;
     }
+
+    /**
+     * @param string $id
+     * @return static
+     */
+    protected function newElement($id)
+    {
+        return new static($this->executor, $id, $this->webdriver);
+    }
 }

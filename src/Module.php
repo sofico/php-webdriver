@@ -89,12 +89,13 @@ abstract class Module extends RemoteElement implements Context
 
     /**
      * @param WebDriverBy $by
-     * @param int $timeout in s (default 5)
+     * @param string $class
+     * @param int $timeout
      * @return mixed
      */
-    public function waitForModule(WebDriverBy $by, int $timeout = 5)
+    public function waitForModule(WebDriverBy $by, string $class, int $timeout = 5)
     {
-        return $this->traitWaitForModule($by, $timeout, true);
+        return $this->traitWaitForModule($by, $class, $timeout, true);
     }
 
     /**

@@ -149,9 +149,9 @@ trait CommonTrait
      * @param bool $nested
      * @return mixed
      */
-    public function waitForModule(WebDriverBy $by, int $timeout, bool $nested)
+    public function waitForModule(WebDriverBy $by, string $class, int $timeout, bool $nested)
     {
-        return $this->waitForDOMElement($by, $timeout, $nested, 'findModule');
+        return $this->waitForDOMElement($by, $timeout, $nested, 'findModule', $class);
     }
 
     /**
@@ -162,12 +162,12 @@ trait CommonTrait
      * @return mixed
      * @throws TimeOutException
      */
-    private function waitForDOMElement(WebDriverBy $by, int $timeout, bool $nested, $method)
+    private function waitForDOMElement(WebDriverBy $by, int $timeout, bool $nested, $method, string $class = '')
     {
         $end = microtime(true) + ($timeout * 1000);
         while ($end > microtime(true)) {
             try {
-                return $this->$method($by, $nested);
+                return $method === 'findElement' ? $this->$method($by, $nested) : $this->$method($by, $class, $nested);
             } catch (NoSuchElementException $e) {
             }
         }

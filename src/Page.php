@@ -5,6 +5,7 @@ namespace Sofico\Webdriver;
 use Facebook\WebDriver\Remote\RemoteExecuteMethod;
 use Facebook\WebDriver\Remote\RemoteWebElement;
 use Facebook\WebDriver\WebDriverBy;
+use function sleep;
 
 abstract class Page implements Context
 {
@@ -69,6 +70,7 @@ abstract class Page implements Context
      */
     protected function initializeElements()
     {
+        sleep($this->webdriver->getConfig()->getWaitBeforeElInit());
         $this->beforeInitializeElements();
     }
 
@@ -122,12 +124,13 @@ abstract class Page implements Context
 
     /**
      * @param WebDriverBy $by
-     * @param int $timeout in s (default 5)
+     * @param string $class
+     * @param int $timeout
      * @return mixed
      */
-    public function waitForModule(WebDriverBy $by, int $timeout = 5)
+    public function waitForModule(WebDriverBy $by, string $class, int $timeout = 5)
     {
-        return $this->traitWaitForModule($by, $timeout, false);
+        return $this->traitWaitForModule($by, $class, $timeout, false);
     }
 
     /**

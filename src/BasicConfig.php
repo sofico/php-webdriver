@@ -17,17 +17,24 @@ use Exception;
 class BasicConfig
 {
 
+    // External
+    const PROJECT_NAME = 'project_name';
     const ENV = 'env';
-    const DRIVER_DIR = 'driver_dir';
     const BROWSER_NAME = 'browser_name';
+    const DRIVER_DIR = 'driver_dir';
     const HUB_ADDRESS = 'hub_address';
     const REPORT = 'report';
+    const REPORT_DIR = 'report_dir';
     const TEST_NAME = 'test_name';
     const BASE_URL = 'base_url';
+    const WAIT_BEFORE_ELEMENT_INIT = 'wait_before_element_init';
+
+    // Internal
+    const LOG_FILE_NAME = 'driver.log';
+    const SCREEN_FILE_NAME = 'endingScreen.png';
 
     protected $baseDir;
     protected $configDir;
-    protected $commonReportDir;
     protected $basicConfigFile;
     protected $config = [];
 
@@ -39,15 +46,21 @@ class BasicConfig
     {
         $this->baseDir = dirname(dirname(dirname(dirname(__DIR__))));
         $this->configDir = $this->baseDir . "/src/Config";
-        $this->commonReportDir = $this->baseDir . "/Reports";
         $this->basicConfigFile = $this->configDir . "/config.ini";
         if (!file_exists($this->basicConfigFile)) {
             throw new Exception($this->basicConfigFile . " not found");
         }
         $this->config['ini_default'] = parse_ini_file($this->basicConfigFile);
-        $env = $this->getProperty(self::ENV);
-        $this->config['ini_env'] = parse_ini_file("{$this->configDir}/config.$env.ini");
+        $this->config['ini_env'] = parse_ini_file("{$this->configDir}/{$this->getProjectName()}/config.{$this->getEnv()}.ini");
         $this->config['env'] = $_SERVER;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEnv(): string
+    {
+        return $this->getProperty(self::ENV);
     }
 
     /**
@@ -75,6 +88,14 @@ class BasicConfig
     }
 
     /**
+     *
+     */
+    public function getProjectName(): string
+    {
+        return $this->getProperty(self::PROJECT_NAME);
+    }
+
+    /**
      * @return string
      */
     public function getHubAddress(): string
@@ -95,7 +116,12 @@ class BasicConfig
      */
     public function getCommonReportDir(): string
     {
-        return $this->commonReportDir;
+        return $this->getProperty(self::REPORT_DIR, $this->baseDir . "/Reports");
+    }
+
+    public function getWaitBeforeElInit()
+    {
+        return $this->getProperty(self::WAIT_BEFORE_ELEMENT_INIT, 0);
     }
 
     /**
