@@ -52,9 +52,9 @@ abstract class Module extends RemoteElement implements Context
      * @param WebDriverBy $by
      * @return RemoteWebElement
      */
-    public function findElement(WebDriverBy $by)
+    public function findElement(WebDriverBy $by, bool $throwEx = true)
     {
-        return $this->traitFindElement($by, true);
+        return $this->traitFindElement($by, $throwEx, true);
     }
 
     /**
@@ -82,9 +82,9 @@ abstract class Module extends RemoteElement implements Context
      * @param string $class
      * @return mixed
      */
-    public function findModule(WebDriverBy $by, string $class)
+    public function findModule(WebDriverBy $by, string $class, bool $throwEx = true)
     {
-        return $this->traitFindModule($by, $class, true);
+        return $this->traitFindModule($by, $class, $throwEx, true);
     }
 
     /**

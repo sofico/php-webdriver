@@ -26,18 +26,23 @@ trait CommonTrait
      * @return RemoteWebElement NoSuchElementException is thrown in HttpCommandExecutor if no element is found.
      * @see WebDriverBy
      */
-    public function findElement(WebDriverBy $by, bool $nested)
+    public function findElement(WebDriverBy $by, bool $throwEx, bool $nested)
     {
-        $this->log(LogLevel::INFO, "Looking for element with [{$by->getMechanism()}: '{$by->getValue()}']");
-        $params = [
-            'using' => $by->getMechanism(),
-            'value' => $by->getValue()
-        ];
-        if ($nested) $params[':id'] = $this->id;
-        $command = $nested ? DriverCommand::FIND_CHILD_ELEMENT : DriverCommand::FIND_ELEMENT;
-        $raw_element = $this->getWebdriver()->execute($command, $params);
+        try {
+            $this->log(LogLevel::INFO, "Looking for element with [{$by->getMechanism()}: '{$by->getValue()}']");
+            $params = [
+                'using' => $by->getMechanism(),
+                'value' => $by->getValue()
+            ];
+            if ($nested) $params[':id'] = $this->id;
+            $command = $nested ? DriverCommand::FIND_CHILD_ELEMENT : DriverCommand::FIND_ELEMENT;
+            $raw_element = $this->getWebdriver()->execute($command, $params);
 
-        return $this->newElement($raw_element['ELEMENT']);
+            return $this->newElement($raw_element['ELEMENT']);
+        } catch (NoSuchElementException $e) {
+            if ($throwEx) throw $e;
+            return null;
+        }
     }
 
     /**
@@ -84,18 +89,23 @@ trait CommonTrait
      * @param string $class
      * @return mixed
      */
-    private function findModule(WebDriverBy $by, string $class, bool $nested)
+    private function findModule(WebDriverBy $by, string $class, bool $throwEx, bool $nested)
     {
-        $this->log(LogLevel::INFO, "Looking for module with [{$by->getMechanism()}: '{$by->getValue()}']");
-        $params = [
-            'using' => $by->getMechanism(),
-            'value' => $by->getValue()
-        ];
-        if ($nested) $params[':id'] = $this->id;
-        $command = $nested ? DriverCommand::FIND_CHILD_ELEMENT : DriverCommand::FIND_ELEMENT;
-        $raw_element = $this->getWebdriver()->execute($command, $params);
+        try {
+            $this->log(LogLevel::INFO, "Looking for module with [{$by->getMechanism()}: '{$by->getValue()}']");
+            $params = [
+                'using' => $by->getMechanism(),
+                'value' => $by->getValue()
+            ];
+            if ($nested) $params[':id'] = $this->id;
+            $command = $nested ? DriverCommand::FIND_CHILD_ELEMENT : DriverCommand::FIND_ELEMENT;
+            $raw_element = $this->getWebdriver()->execute($command, $params);
 
-        return $this->newModule($raw_element['ELEMENT'], $class);
+            return $this->newModule($raw_element['ELEMENT'], $class);
+        } catch (NoSuchElementException $e) {
+            if ($throwEx) throw $e;
+            return null;
+        }
     }
 
     /**
