@@ -23,6 +23,7 @@ class BasicConfig
     const BROWSER_NAME = 'browser_name';
     const DRIVER_DIR = 'driver_dir';
     const HUB_ADDRESS = 'hub_address';
+    const STORE_RESULT = 'store_result';
     const REPORT = 'report';
     const REPORT_DIR = 'report_dir';
     const TEST_NAME = 'test_name';
@@ -104,11 +105,19 @@ class BasicConfig
     }
 
     /**
-     * @return string
+     * @return bool
      */
-    public function reportingActive(): string
+    public function storeResult(): bool
     {
-        return $this->getProperty(self::REPORT, true);
+        return $this->getAsBoolean($this->getProperty(self::STORE_RESULT, true));
+    }
+
+    /**
+     * @return bool
+     */
+    public function reportingActive(): bool
+    {
+        return $this->getAsBoolean($this->getProperty(self::REPORT, true));
     }
 
     /**
@@ -171,5 +180,8 @@ class BasicConfig
         $this->config['code'][$propertyName] = $propertyValue;
     }
 
-
+    private function getAsBoolean($value)
+    {
+        return filter_var($value, FILTER_VALIDATE_BOOLEAN);
+    }
 }

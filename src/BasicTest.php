@@ -7,6 +7,7 @@ use Exception;
 use Facebook\WebDriver\Remote\DesiredCapabilities;
 use Facebook\WebDriver\Remote\WebDriverBrowserType;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Runner\BaseTestRunner;
 use Psr\Log\LogLevel;
 use ReflectionMethod;
 use Sofico\Webdriver\Storage\ElasticsearchStorageImpl;
@@ -86,11 +87,11 @@ abstract class BasicTest extends TestCase
         $this->driver->quit();
         $this->result->setEnded((int)round(microtime(true) * 1000));
         $this->driver->log(LogLevel::INFO, "=== {$this->getName()} finished ===");
-        if ($this->getStatus() !== 0) {
+        if ($this->getStatus() !== BaseTestRunner::STATUS_PASSED) {
             $this->result->setStatus(ResultStatus::FAILED);
             $this->result->setError($this->getStatusMessage());
         }
-        (new ElasticsearchStorageImpl())->store($this->result);
+        if ($this->driver->getConfig()->storeResult()) (new ElasticsearchStorageImpl())->store($this->result);
     }
 
     protected function onNotSuccessfulTest(Throwable $e)
