@@ -30,7 +30,8 @@ abstract class BasicTest extends TestCase
     protected function setUp()
     {
 
-        $config = new BasicConfig();
+        $config = $this->createConfig();
+        /** @var BasicConfig $config */
         $driverDir = $config->getDriverDir();
         $browserName = $config->getBrowserName();
         $capabilities = null;
@@ -70,6 +71,8 @@ abstract class BasicTest extends TestCase
         if (!is_null($testConfig)) $this->result->setSeverity($testConfig->getSeverity());
     }
 
+    protected abstract function createConfig();
+
     /**
      * @return TestConfig
      */
@@ -87,7 +90,11 @@ abstract class BasicTest extends TestCase
         $this->driver->quit();
         $this->result->setEnded((int)round(microtime(true) * 1000));
         $this->driver->log(LogLevel::INFO, "=== {$this->getName()} finished ===");
-        if ($this->getStatus() !== BaseTestRunner::STATUS_PASSED) {
+        $status = $this->getStatus();
+        if ($status === BaseTestRunner::STATUS_SKIPPED) {
+            $this->result->setStatus(ResultStatus::SKIPPED);
+            $this->result->setError($this->getStatusMessage());
+        } else if ($status !== BaseTestRunner::STATUS_PASSED) {
             $this->result->setStatus(ResultStatus::FAILED);
             $this->result->setError($this->getStatusMessage());
         }

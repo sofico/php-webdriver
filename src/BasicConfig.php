@@ -180,7 +180,7 @@ class BasicConfig
         $this->config['code'][$propertyName] = $propertyValue;
     }
 
-    private function getAsBoolean($value)
+    protected function getAsBoolean($value)
     {
         return filter_var($value, FILTER_VALIDATE_BOOLEAN);
     }
