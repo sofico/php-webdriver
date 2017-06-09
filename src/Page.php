@@ -20,6 +20,7 @@ abstract class Page implements Context
     use LoggingTrait;
 
     protected $webdriver;
+    protected $domain;
     protected $address;
     protected $executeMethod;
 
@@ -32,7 +33,8 @@ abstract class Page implements Context
     {
         $this->executeMethod = $executeMethod;
         $this->webdriver = $webdriver;
-        $this->address = $this->getBaseUrl() . $this->getUrl();
+        $this->domain = $webdriver->getConfig()->getDomain();
+        $this->address = $this->domain . $this->getUrl();
         if ($init) $this->initializeElements();
     }
 
@@ -163,9 +165,9 @@ abstract class Page implements Context
     /**
      * @return string
      */
-    protected function getBaseUrl(): string
+    protected function getDomain(): string
     {
-        return $this->webdriver->getConfig()->getBaseUrl();
+        return $this->domain;
     }
 
     /**

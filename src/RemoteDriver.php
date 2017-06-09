@@ -97,7 +97,7 @@ class RemoteDriver extends RemoteWebDriver implements Context
      */
     public function initPage(string $pageClass, bool $initElements = true)
     {
-        return new $pageClass($this, $initElements, $this->executeMethod);
+        return new $pageClass($this, $initElements, $this->getExecuteMethod());
     }
 
     /**

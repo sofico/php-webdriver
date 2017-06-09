@@ -27,7 +27,7 @@ class BasicConfig
     const REPORT = 'report';
     const REPORT_DIR = 'report_dir';
     const TEST_NAME = 'test_name';
-    const BASE_URL = 'base_url';
+    const DOMAIN = 'domain';
     const WAIT_BEFORE_ELEMENT_INIT = 'wait_before_element_init';
 
     // Internal
@@ -52,7 +52,11 @@ class BasicConfig
             throw new Exception($this->basicConfigFile . " not found");
         }
         $this->config['ini_default'] = parse_ini_file($this->basicConfigFile);
-        $this->config['ini_env'] = parse_ini_file("{$this->configDir}/{$this->getProjectName()}/config.{$this->getEnv()}.ini");
+        $envConfigFile = "{$this->configDir}/{$this->getProjectName()}/config.{$this->getEnv()}.ini";
+        if (!file_exists($envConfigFile)) {
+            throw new Exception("$envConfigFile not found");
+        }
+        $this->config['ini_env'] = parse_ini_file($envConfigFile);
         $this->config['env'] = $_SERVER;
     }
 
@@ -75,9 +79,9 @@ class BasicConfig
     /**
      * @return string
      */
-    public function getBaseUrl(): string
+    public function getDomain(): string
     {
-        return $this->getProperty(self::BASE_URL);
+        return $this->getProperty(self::DOMAIN);
     }
 
     /**
