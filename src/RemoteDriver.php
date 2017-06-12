@@ -81,13 +81,25 @@ class RemoteDriver extends RemoteWebDriver implements Context
     }
 
     /**
+     * Use to navigate directly to page and initialize it.
      * @param string $pageClass
      * @return mixed
      */
     public function goToPage(string $pageClass)
     {
-        $page = $this->initPage($pageClass, false);
-        return $page->goTo();
+        return $this->constructPage($pageClass)->goTo();
+    }
+
+    /**
+     * Use this to initialize page you got on by click or any other interaction with browser.
+     * @param string $pageClass
+     * @return mixed
+     */
+    public function initPage(string $pageClass)
+    {
+        $page = $this->constructPage($pageClass);
+        $page->initializeElements();
+        return $page;
     }
 
     /**
@@ -95,9 +107,9 @@ class RemoteDriver extends RemoteWebDriver implements Context
      * @param bool $initElements
      * @return mixed
      */
-    public function initPage(string $pageClass, bool $initElements = true)
+    public function constructPage(string $pageClass)
     {
-        return new $pageClass($this, $initElements, $this->getExecuteMethod());
+        return new $pageClass($this, $this->getExecuteMethod());
     }
 
     /**

@@ -16,6 +16,6 @@ interface Context
 
     public function getProperty(string $propertyName);
 
-    public function initPage(string $pageClass, bool $initElements = true);
+    public function initPage(string $pageClass);
 
 }

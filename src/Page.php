@@ -5,6 +5,7 @@ namespace Sofico\Webdriver;
 use Facebook\WebDriver\Remote\RemoteExecuteMethod;
 use Facebook\WebDriver\Remote\RemoteWebElement;
 use Facebook\WebDriver\WebDriverBy;
+use function get_class;
 use function sleep;
 
 abstract class Page implements Context
@@ -29,13 +30,12 @@ abstract class Page implements Context
      * @param RemoteDriver $webdriver
      * @param bool $init
      */
-    public function __construct(RemoteDriver $webdriver, bool $init = true, RemoteExecuteMethod $executeMethod)
+    public function __construct(RemoteDriver $webdriver, RemoteExecuteMethod $executeMethod)
     {
         $this->executeMethod = $executeMethod;
         $this->webdriver = $webdriver;
         $this->domain = $webdriver->getConfig()->getDomain();
         $this->address = $this->domain . $this->getUrl();
-        if ($init) $this->initializeElements();
     }
 
     /**
@@ -43,9 +43,14 @@ abstract class Page implements Context
      * @param bool $initElements
      * @return mixed
      */
-    public function initPage(string $pageClass, bool $initElements = true)
+    public function initPage(string $pageClass)
     {
-        return $this->webdriver->initPage($pageClass, $initElements);
+        return $this->webdriver->initPage($pageClass);
+    }
+
+    public function initThisPage()
+    {
+        return $this->webdriver->initPage(get_class($this));
     }
 
     /**
@@ -70,7 +75,7 @@ abstract class Page implements Context
     /**
      * Override this to initialize elements
      */
-    protected function initializeElements()
+    public function initializeElements()
     {
         sleep($this->webdriver->getConfig()->getWaitBeforeElInit());
         $this->beforeInitializeElements();

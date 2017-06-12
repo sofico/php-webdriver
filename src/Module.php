@@ -43,9 +43,9 @@ abstract class Module extends RemoteElement implements Context
      * @param bool $initElements
      * @return mixed
      */
-    public function initPage(string $pageClass, bool $initElements = true)
+    public function initPage(string $pageClass)
     {
-        return $this->webdriver->initPage($pageClass, $initElements);
+        return $this->webdriver->initPage($pageClass);
     }
 
     /**
