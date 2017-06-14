@@ -5,7 +5,7 @@ namespace Sofico\Webdriver;
 use Exception;
 
 /**
- * By default reads values from src/Config/config.ini and src/Config/config.{env}.ini, where {env} is specified in src/Config/config.ini.
+ * By default reads values from src/Config/config.ini and src/Config/{project_name}/config.{env}.ini, where {env} and {project_name} is specified in src/Config/config.ini.
  * Minimal required values are: <ul>
  *  <li>env - used for loading proper file with environment specific values</li>
  *  <li>driver_dir - path to drivers</li>
@@ -29,6 +29,7 @@ class BasicConfig
     const TEST_NAME = 'test_name';
     const DOMAIN = 'domain';
     const WAIT_BEFORE_ELEMENT_INIT = 'wait_before_element_init';
+    const IS_B2B = 'is_b2b';
 
     // Internal
     const LOG_FILE_NAME = 'driver.log';
@@ -93,7 +94,7 @@ class BasicConfig
     }
 
     /**
-     *
+     * @return string
      */
     public function getProjectName(): string
     {
@@ -132,9 +133,20 @@ class BasicConfig
         return $this->getProperty(self::REPORT_DIR, $this->baseDir . "/Reports");
     }
 
-    public function getWaitBeforeElInit()
+    /**
+     * @return int
+     */
+    public function getWaitBeforeElInit(): int
     {
-        return $this->getProperty(self::WAIT_BEFORE_ELEMENT_INIT, 0);
+        return (int)$this->getProperty(self::WAIT_BEFORE_ELEMENT_INIT, 0);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isB2B()
+    {
+        return $this->getAsBoolean($this->getProperty(self::IS_B2B, false));
     }
 
     /**
@@ -184,7 +196,11 @@ class BasicConfig
         $this->config['code'][$propertyName] = $propertyValue;
     }
 
-    protected function getAsBoolean($value)
+    /**
+     * @param $value
+     * @return bool
+     */
+    protected function getAsBoolean($value): bool
     {
         return filter_var($value, FILTER_VALIDATE_BOOLEAN);
     }

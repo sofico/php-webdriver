@@ -174,7 +174,7 @@ trait CommonTrait
      */
     private function waitForDOMElement(WebDriverBy $by, int $timeout, bool $nested, $method, string $class = '')
     {
-        $end = microtime(true) + ($timeout * 1000);
+        $end = microtime(true) + $timeout;
         while ($end > microtime(true)) {
             try {
                 return $method === 'findElement' ? $this->$method($by, $nested) : $this->$method($by, $class, $nested);
@@ -185,11 +185,13 @@ trait CommonTrait
     }
 
     /**
-     * @param int $timeout
+     * @param int $timeout_in_second
+     * @param int $interval_in_millisecond
+     * @return WebDriverWait
      */
-    public function waitUntil($func_or_ec, string $message = '', int $timeout = 5)
+    public function wait($timeout_in_second = 30, $interval_in_millisecond = 250): WebDriverWait
     {
-        $wait = new WebDriverWait($this->getWebdriver(), $timeout);
-        $wait->until($func_or_ec, $message);
+        if ($this instanceof RemoteDriver) return parent::wait($timeout_in_second, $interval_in_millisecond);
+        else return $this->getWebdriver()->wait($timeout_in_second, $interval_in_millisecond);
     }
 }
