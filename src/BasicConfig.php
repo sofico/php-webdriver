@@ -29,7 +29,6 @@ class BasicConfig
     const TEST_NAME = 'test_name';
     const DOMAIN = 'domain';
     const WAIT_BEFORE_ELEMENT_INIT = 'wait_before_element_init';
-    const IS_B2B = 'is_b2b';
 
     // Internal
     const LOG_FILE_NAME = 'driver.log';
@@ -53,7 +52,7 @@ class BasicConfig
             throw new Exception($this->basicConfigFile . " not found");
         }
         $this->config['ini_default'] = parse_ini_file($this->basicConfigFile);
-        $envConfigFile = "{$this->configDir}/{$this->getProjectName()}/config.{$this->getEnv()}.ini";
+        $envConfigFile = "{$this->configDir}/config.{$this->getEnv()}.ini";
         if (!file_exists($envConfigFile)) {
             throw new Exception("$envConfigFile not found");
         }
@@ -139,14 +138,6 @@ class BasicConfig
     public function getWaitBeforeElInit(): int
     {
         return (int)$this->getProperty(self::WAIT_BEFORE_ELEMENT_INIT, 0);
-    }
-
-    /**
-     * @return bool
-     */
-    public function isB2B()
-    {
-        return $this->getAsBoolean($this->getProperty(self::IS_B2B, false));
     }
 
     /**

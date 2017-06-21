@@ -46,10 +46,7 @@ abstract class Page implements Context
         return $this->webdriver->initPage($pageClass);
     }
 
-    /**
-     * @return Page
-     */
-    public function initThisPage(): self
+    public function initThisPage()
     {
         return $this->webdriver->initPage(get_class($this));
     }

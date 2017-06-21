@@ -2,7 +2,6 @@
 
 namespace Sofico\Webdriver;
 
-use Facebook\WebDriver\Remote\HttpCommandExecutor;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\Remote\RemoteWebElement;
 use Facebook\WebDriver\WebDriverBy;
@@ -29,18 +28,11 @@ class RemoteDriver extends RemoteWebDriver implements Context
 
     /* @var Logger */
     protected $logger;
-    protected $timestamp;
     protected $testReportDir;
     /* @var BasicConfig */
     protected $config;
     /* @var bool */
     protected $reportingActive;
-
-    public function __construct(HttpCommandExecutor $commandExecutor, $sessionId, $capabilities = null)
-    {
-        $this->timestamp = time();
-        parent::__construct($commandExecutor, $sessionId, $capabilities);
-    }
 
     /**
      * @param BasicConfig $config
@@ -61,7 +53,13 @@ class RemoteDriver extends RemoteWebDriver implements Context
      */
     private function createLogFile(BasicConfig $config): string
     {
-        $this->testReportDir = "{$config->getBaseDir()}/Reports/{$this->config->getProjectName()}/{$this->config->getEnv()}/{$this->config->getBrowserName()}/{$this->timestamp}_{$this->config->getProperty(BasicConfig::TEST_NAME)}";
+        $date = date("Y-m-d_H:i:s.s");
+        $projectName = $this->getConfig()->getProjectName();
+        $env = $this->config->getEnv();
+        $browserName = $this->config->getBrowserName();
+        $testName = $this->config->getProperty(BasicConfig::TEST_NAME);
+
+        $this->testReportDir = "{$config->getBaseDir()}/Reports/$date-$projectName-$env-$browserName-$testName";
         mkdir($this->testReportDir, 0777, true);
         $logFile = "{$this->testReportDir}/" . BasicConfig::LOG_FILE_NAME;
         fopen($logFile, 'a');
@@ -74,10 +72,15 @@ class RemoteDriver extends RemoteWebDriver implements Context
     private function createLogger($logFile)
     {
         $this->logger = new Logger('DriverLogger');
-        $handler = new StreamHandler($logFile, Logger::DEBUG);
-        $handler->getFormatter()->ignoreEmptyContextAndExtra(true);
-        $handler->getFormatter()->includeStacktraces(true);
-        $this->logger->pushHandler($handler);
+        $fileHandler = new StreamHandler($logFile, Logger::DEBUG);
+        $fileHandler->getFormatter()->ignoreEmptyContextAndExtra(true);
+        $fileHandler->getFormatter()->includeStacktraces(true);
+        $this->logger->pushHandler($fileHandler);
+
+        $consoleHandler = new StreamHandler('php://stdout', Logger::DEBUG);
+        $consoleHandler->getFormatter()->ignoreEmptyContextAndExtra(true);
+        $consoleHandler->getFormatter()->includeStacktraces(true);
+        $this->logger->pushHandler($consoleHandler);
     }
 
     /**
@@ -179,14 +182,6 @@ class RemoteDriver extends RemoteWebDriver implements Context
     public function logResultScreen()
     {
         $this->reportingActive ? $this->takeScreenshot($this->getTestReportDir() . '/' . BasicConfig::SCREEN_FILE_NAME) : "";
-    }
-
-    /**
-     * @return int
-     */
-    public function getTimestamp(): int
-    {
-        return $this->timestamp;
     }
 
     /**

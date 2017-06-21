@@ -194,4 +194,13 @@ trait CommonTrait
         if ($this instanceof RemoteDriver) return parent::wait($timeout_in_second, $interval_in_millisecond);
         else return $this->getWebdriver()->wait($timeout_in_second, $interval_in_millisecond);
     }
+
+    /**
+     * @param By $by
+     * @return bool
+     */
+    public function containsElement(WebDriverBy $by): bool
+    {
+        return !is_null($this->findElement($by, false));
+    }
 }
