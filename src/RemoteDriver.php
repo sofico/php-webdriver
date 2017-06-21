@@ -53,7 +53,7 @@ class RemoteDriver extends RemoteWebDriver implements Context
      */
     private function createLogFile(BasicConfig $config): string
     {
-        $date = date("Y-m-d_H:i:s.s");
+        $date = date("Y-m-d_H.i.s.s");
         $projectName = $this->getConfig()->getProjectName();
         $env = $this->config->getEnv();
         $browserName = $this->config->getBrowserName();
