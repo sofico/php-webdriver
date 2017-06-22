@@ -39,6 +39,7 @@ abstract class ValidationSetup extends TestCase
 
         $config = new BasicConfig();
         /** @var BasicConfig $config */
+        $config->addProperty(BasicConfig::REPORT, true);
         $config->addProperty(BasicConfig::TEST_NAME, $this->getName());
         $this->driver = $this->createDriver($config);
         $this->driver->manage()->window()->maximize();
@@ -147,9 +148,7 @@ abstract class ValidationSetup extends TestCase
      */
     private function logErrors($url, $state, $messageEls)
     {
-        $resultFolderPath = "{$this->driver->getTestReportDir()}/";
-        $resultFilePath = "$resultFolderPath/results.html";
-        if (!file_exists($resultFolderPath)) mkdir($resultFolderPath, 0777, true);
+        $resultFilePath = "{$this->driver->getTestReportDir()}/results.html";
         if (!file_exists($resultFilePath)) {
             $resultFile = fopen($resultFilePath, 'a');
             fwrite($resultFile, self::$BOM);
