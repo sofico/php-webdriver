@@ -21,6 +21,7 @@ use function fopen;
 use function fwrite;
 use function is_null;
 use function mkdir;
+use function str_replace;
 use function strpos;
 
 abstract class ValidationSetup extends TestCase
@@ -100,6 +101,7 @@ abstract class ValidationSetup extends TestCase
 
     private function savePageSourceToReport(string $state)
     {
+        $state = str_replace(':', ')', $state); // windows cant hangle : in file name
         $pathToPageSource = "{$this->driver->getTestReportDir()}/$state.html";
         $pageSource = fopen($pathToPageSource, 'wb');
         fwrite($pageSource, self::$BOM . $this->driver->getPageSource());
