@@ -8,6 +8,9 @@ use Facebook\WebDriver\WebDriverBy;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use const true;
+use function fclose;
+use function fopen;
+use function fwrite;
 
 /**
  * Extended {@see WebDriver} with custom functions.
@@ -175,11 +178,19 @@ class RemoteDriver extends RemoteWebDriver implements Context
         return $this->traitFindModules($by, $class, false);
     }
 
+    public function reportPageSource()
+    {
+        if ($this->reportingActive) {
+            $resource = fopen($this->getTestReportDir() . '/pagesource.html', 'wb');
+            fwrite($resource, chr(239) . chr(187) . chr(191) . $this->getPageSource());
+            fclose($resource);
+        }
+    }
 
     /**
      *
      */
-    public function logResultScreen()
+    public function reportResultScreen()
     {
         $this->reportingActive ? $this->takeScreenshot($this->getTestReportDir() . '/' . BasicConfig::SCREEN_FILE_NAME) : "";
     }

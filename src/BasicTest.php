@@ -86,7 +86,8 @@ abstract class BasicTest extends TestCase
 
     protected function tearDown()
     {
-        $this->driver->logResultScreen();
+        $this->driver->reportPageSource();
+        $this->driver->reportResultScreen();
         $this->driver->quit();
         $this->result->setEnded((int)round(microtime(true) * 1000));
         $this->driver->log(LogLevel::INFO, "=== {$this->getName()} finished ===");
