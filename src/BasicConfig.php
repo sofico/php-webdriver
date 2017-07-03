@@ -30,6 +30,9 @@ class BasicConfig
     const DOMAIN = 'domain';
     const WAIT_BEFORE_ELEMENT_INIT = 'wait_before_element_init';
 
+    const ELK_USERNAME = 'elk_username';
+    const ELK_PASSWORD = 'elk_password';
+
     // Internal
     const LOG_FILE_NAME = 'driver.log';
     const SCREEN_FILE_NAME = 'endingScreen.png';

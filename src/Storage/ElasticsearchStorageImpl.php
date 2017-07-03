@@ -10,6 +10,8 @@ namespace Sofico\Webdriver\Storage;
 
 
 use Elasticsearch\ClientBuilder;
+use PHPUnit\Exception;
+use Sofico\Webdriver\BasicConfig;
 
 class ElasticsearchStorageImpl implements Storage
 {
@@ -18,9 +20,18 @@ class ElasticsearchStorageImpl implements Storage
 
     protected $client;
 
-    public function __construct()
+    public function __construct(BasicConfig $config)
     {
-        $this->client = ClientBuilder::create()->build();;
+        try {
+            $username = $config->getProperty($config::ELK_USERNAME);
+            $password = $config->getProperty($config::ELK_PASSWORD);
+            $hosts = [
+                "http://$username:$password@localhost:9200",
+            ];
+            $this->client = ClientBuilder::create()->setHosts($hosts)->build();;
+        } catch (Exception $e) {
+            $this->client = ClientBuilder::create()->build();;
+        }
     }
 
     public function store(Result $result)

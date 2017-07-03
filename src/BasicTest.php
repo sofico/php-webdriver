@@ -99,7 +99,7 @@ abstract class BasicTest extends TestCase
             $this->result->setStatus(ResultStatus::FAILED);
             $this->result->setError($this->getStatusMessage());
         }
-        if ($this->driver->getConfig()->storeResult()) (new ElasticsearchStorageImpl())->store($this->result);
+        if ($this->driver->getConfig()->storeResult()) (new ElasticsearchStorageImpl($this->driver->getConfig()))->store($this->result);
     }
 
     protected function onNotSuccessfulTest(Throwable $e)
