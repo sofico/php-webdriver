@@ -10,7 +10,7 @@ namespace Sofico\Webdriver\Storage;
 
 
 use Elasticsearch\ClientBuilder;
-use PHPUnit\Exception;
+use Exception;
 use Sofico\Webdriver\BasicConfig;
 
 class ElasticsearchStorageImpl implements Storage
