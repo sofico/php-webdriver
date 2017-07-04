@@ -109,15 +109,6 @@ abstract class Module extends RemoteElement implements Context
     }
 
     /**
-     * @param string $id
-     * @return RemoteWebElement
-     */
-    protected function newElement($id)
-    {
-        return new RemoteWebElement($this->getExecuteMethod(), $id);
-    }
-
-    /**
      * @return RemoteDriver
      */
     public function getWebdriver()
