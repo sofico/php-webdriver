@@ -3,6 +3,8 @@
 namespace Sofico\Webdriver;
 
 use Exception;
+use Facebook\WebDriver\Chrome\ChromeOptions;
+use Facebook\WebDriver\Firefox\FirefoxProfile;
 
 /**
  * By default reads values from src/Config/config.ini and src/Config/{project_name}/config.{env}.ini, where {env} and {project_name} is specified in src/Config/config.ini.
@@ -199,4 +201,25 @@ class BasicConfig
     {
         return filter_var($value, FILTER_VALIDATE_BOOLEAN);
     }
+
+    /**
+     * Override this and add desired options
+     * @param ChromeOptions $chromeOptions
+     * @return ChromeOptions
+     */
+    public function setupChromeOptions(ChromeOptions $chromeOptions): ChromeOptions
+    {
+        return $chromeOptions;
+    }
+
+    /**
+     * Override this and add desired options
+     * @param FirefoxProfile $firefoxProfile
+     * @return FirefoxProfile
+     */
+    public function setupFirefoxProfile(FirefoxProfile $firefoxProfile): FirefoxProfile
+    {
+        return $firefoxProfile;
+    }
+
 }

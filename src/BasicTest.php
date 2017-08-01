@@ -4,6 +4,9 @@ namespace Sofico\Webdriver;
 
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Exception;
+use Facebook\WebDriver\Chrome\ChromeOptions;
+use Facebook\WebDriver\Firefox\FirefoxDriver;
+use Facebook\WebDriver\Firefox\FirefoxProfile;
 use Facebook\WebDriver\Remote\DesiredCapabilities;
 use Facebook\WebDriver\Remote\WebDriverBrowserType;
 use PHPUnit\Framework\TestCase;
@@ -39,10 +42,14 @@ abstract class BasicTest extends TestCase
             case WebDriverBrowserType::FIREFOX:
                 putenv("webdriver.gecko.driver=$driverDir/geckodriver");
                 $capabilities = DesiredCapabilities::firefox();
+                $firefoxProfile = $config->setupFirefoxProfile(new FirefoxProfile());
+                $capabilities->setCapability(FirefoxDriver::PROFILE, $firefoxProfile);
                 break;
             case WebDriverBrowserType::CHROME:
                 putenv("webdriver.chrome.driver=$driverDir/chromedriver");
                 $capabilities = DesiredCapabilities::chrome();
+                $chromeOptions = $config->setupChromeOptions(new ChromeOptions());
+                $capabilities->setCapability(ChromeOptions::CAPABILITY, $chromeOptions);
                 break;
             case WebDriverBrowserType::IE:
                 putenv("webdriver.ie.driver=$driverDir/IEDriverServer.exe");
@@ -105,6 +112,7 @@ abstract class BasicTest extends TestCase
     protected function onNotSuccessfulTest(Throwable $e)
     {
         $this->driver->log(LogLevel::ERROR, "{$e->getMessage()} \n{$e->getTraceAsString()}");
+        $this->driver->log(LogLevel::ERROR, "Error page: {$this->driver->getCurrentURL()}");
         parent::onNotSuccessfulTest($e);
     }
 
