@@ -11,7 +11,7 @@
     ],
     "require": {
         "php": "~7.0",
-        "facebook/webdriver": "1.4.0",
+        "php-webdriver/webdriver": "^1.8",
         "monolog/monolog": "^1.22",
         "phpunit/phpunit": "^6.1",
         "elasticsearch/elasticsearch": "~5.0",

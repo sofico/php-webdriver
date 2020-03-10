@@ -25,7 +25,7 @@ class RemoteElement extends RemoteWebElement
      */
     public function __construct(RemoteExecuteMethod $executor, string $id, RemoteDriver $driver)
     {
-        parent::__construct($executor, $id);
+        parent::__construct($executor, $id, true);
         $this->webdriver = $driver;
     }
 

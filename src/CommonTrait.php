@@ -12,6 +12,7 @@ namespace Sofico\Webdriver;
 use Facebook\WebDriver\Exception\NoSuchElementException;
 use Facebook\WebDriver\Exception\TimeOutException;
 use Facebook\WebDriver\Remote\DriverCommand;
+use Facebook\WebDriver\Remote\JsonWireCompat;
 use Facebook\WebDriver\Remote\RemoteWebElement;
 use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverWait;
@@ -30,15 +31,12 @@ trait CommonTrait
     {
         try {
             $this->log(LogLevel::INFO, "Looking for element with [{$by->getMechanism()}: '{$by->getValue()}']");
-            $params = [
-                'using' => $by->getMechanism(),
-                'value' => $by->getValue()
-            ];
+            $params = JsonWireCompat::getUsing($by, true);
             if ($nested) $params[':id'] = $this->id;
             $command = $nested ? DriverCommand::FIND_CHILD_ELEMENT : DriverCommand::FIND_ELEMENT;
             $raw_element = $this->getWebdriver()->execute($command, $params);
 
-            return $this->newElement($raw_element['ELEMENT']);
+            return $this->newElement(JsonWireCompat::getElement($raw_element));
         } catch (NoSuchElementException $e) {
             if ($throwEx) throw $e;
             return null;
@@ -56,17 +54,14 @@ trait CommonTrait
     {
         $this->log(LogLevel::INFO, "Looking for elements with [{$by->getMechanism()}: '{$by->getValue()}']");
 
-        $params = [
-            'using' => $by->getMechanism(),
-            'value' => $by->getValue()
-        ];
+        $params = JsonWireCompat::getUsing($by, true);
         if ($nested) $params[':id'] = $this->id;
         $command = $nested ? DriverCommand::FIND_CHILD_ELEMENTS : DriverCommand::FIND_ELEMENTS;
         $raw_elements = $this->getWebdriver()->execute($command, $params);
 
         $elements = [];
         foreach ($raw_elements as $raw_element) {
-            $elements[] = $this->newElement($raw_element['ELEMENT']);
+            $elements[] = $this->newElement(JsonWireCompat::getElement($raw_element));
         }
 
         return $elements;
@@ -93,15 +88,12 @@ trait CommonTrait
     {
         try {
             $this->log(LogLevel::INFO, "Looking for module with [{$by->getMechanism()}: '{$by->getValue()}']");
-            $params = [
-                'using' => $by->getMechanism(),
-                'value' => $by->getValue()
-            ];
+            $params = JsonWireCompat::getUsing($by, true);
             if ($nested) $params[':id'] = $this->id;
             $command = $nested ? DriverCommand::FIND_CHILD_ELEMENT : DriverCommand::FIND_ELEMENT;
             $raw_element = $this->getWebdriver()->execute($command, $params);
 
-            return $this->newModule($raw_element['ELEMENT'], $class);
+            return $this->newModule(JsonWireCompat::getElement($raw_element), $class);
         } catch (NoSuchElementException $e) {
             if ($throwEx) throw $e;
             return null;
@@ -116,17 +108,14 @@ trait CommonTrait
     private function findModules(WebDriverBy $by, string $class, bool $nested)
     {
         $this->log(LogLevel::INFO, "Looking for module with [{$by->getMechanism()}: '{$by->getValue()}']");
-        $params = [
-            'using' => $by->getMechanism(),
-            'value' => $by->getValue()
-        ];
+        $params = JsonWireCompat::getUsing($by, true);
         if ($nested) $params[':id'] = $this->id;
         $command = $nested ? DriverCommand::FIND_CHILD_ELEMENTS : DriverCommand::FIND_ELEMENTS;
         $raw_elements = $this->getWebdriver()->execute($command, $params);
 
         $elements = [];
         foreach ($raw_elements as $raw_element) {
-            $elements[] = $this->newModule($raw_element['ELEMENT'], $class);
+            $elements[] = $this->newModule(JsonWireCompat::getElement($raw_element), $class);
         }
 
         return $elements;
