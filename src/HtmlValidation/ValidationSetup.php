@@ -54,8 +54,6 @@ abstract class ValidationSetup extends TestCase
 
     protected function createDriver(BasicConfig $config): RemoteDriver
     {
-        $driverDir = $config->getDriverDir();
-        putenv("webdriver.chrome.driver=$driverDir/chromedriver");
         $capabilities = DesiredCapabilities::chrome();
         $hub = $config->getHubAddress();
         $driver = RemoteDriver::create($hub, $capabilities);

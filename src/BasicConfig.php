@@ -10,7 +10,6 @@ use Facebook\WebDriver\Firefox\FirefoxProfile;
  * By default reads values from src/Config/config.ini and src/Config/{project_name}/config.{env}.ini, where {env} and {project_name} is specified in src/Config/config.ini.
  * Minimal required values are: <ul>
  *  <li>env - used for loading proper file with environment specific values</li>
- *  <li>driver_dir - path to drivers</li>
  *  <li>browser_name - now supporting values chrome, firefox, internet explorer</li>
  *  <li>base_url - base url to which pages will append their path</li>
  * </ul>
@@ -23,7 +22,6 @@ class BasicConfig
     const PROJECT_NAME = 'project_name';
     const ENV = 'env';
     const BROWSER_NAME = 'browser_name';
-    const DRIVER_DIR = 'driver_dir';
     const HUB_ADDRESS = 'hub_address';
     const STORE_RESULT = 'store_result';
     const REPORT = 'report';
@@ -72,14 +70,6 @@ class BasicConfig
     public function getEnv(): string
     {
         return $this->getProperty(self::ENV);
-    }
-
-    /**
-     * @return string
-     */
-    public function getDriverDir(): string
-    {
-        return $this->getProperty(self::DRIVER_DIR);
     }
 
     /**

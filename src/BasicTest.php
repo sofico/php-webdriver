@@ -35,24 +35,20 @@ abstract class BasicTest extends TestCase
 
         $config = $this->createConfig();
         /** @var BasicConfig $config */
-        $driverDir = $config->getDriverDir();
         $browserName = $config->getBrowserName();
         $capabilities = null;
         switch ($browserName) {
             case WebDriverBrowserType::FIREFOX:
-                putenv("webdriver.gecko.driver=$driverDir/geckodriver");
                 $capabilities = DesiredCapabilities::firefox();
                 $firefoxProfile = $config->setupFirefoxProfile(new FirefoxProfile());
                 $capabilities->setCapability(FirefoxDriver::PROFILE, $firefoxProfile);
                 break;
             case WebDriverBrowserType::CHROME:
-                putenv("webdriver.chrome.driver=$driverDir/chromedriver");
                 $capabilities = DesiredCapabilities::chrome();
                 $chromeOptions = $config->setupChromeOptions(new ChromeOptions());
                 $capabilities->setCapability(ChromeOptions::CAPABILITY, $chromeOptions);
                 break;
             case WebDriverBrowserType::IE:
-                putenv("webdriver.ie.driver=$driverDir/IEDriverServer.exe");
                 $capabilities = DesiredCapabilities::internetExplorer();
                 break;
             default:
