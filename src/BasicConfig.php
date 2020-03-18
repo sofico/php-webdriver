@@ -57,9 +57,13 @@ class BasicConfig
         $this->config = array_fill_keys(array('ini_default', 'ini_env', 'code', 'env'), array());
         $this->config['ini_default'] = parse_ini_file($this->basicConfigFile);
         $this->config['env'] = $_SERVER;
-        $envConfigFile = "{$this->configDir}/config.{$this->getEnv()}.ini";
-        if (!file_exists($envConfigFile)) {
-            throw new Exception("$envConfigFile not found");
+        $envConfigFile = "{$this->configDir}/{$this->getProperty('project_name')}/config.{$this->getEnv()}.ini";
+        if(!file_exists($envConfigFile)) {
+            $envConfigFile = "{$this->configDir}/config.{$this->getEnv()}.ini";
+
+            if (!file_exists($envConfigFile)) {
+                throw new Exception("$envConfigFile not found");
+            }
         }
         $this->config['ini_env'] = parse_ini_file($envConfigFile);
     }
